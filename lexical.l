@@ -62,6 +62,12 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                     
                                     return INT; 
                                 }
+0{DIGIT}+                       {
+                                    yylval.node = NULL;
+                                    error_flag = true;
+                                    printf("Error type A at Line %d: Incorrect oct number \"%s\".\n", yylineno, yytext);
+                                    return INT; // still treat as a node
+                                }
 0(x|X){HEXDIGIT}+               { 
                                     yylval.node = ast_make_new_node(
                                         "INT", 
@@ -75,6 +81,12 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                     print_debug("Lexer DBG: INT with value of%d\n", yylval.node->int_value);
                                     
                                     return INT; 
+                                }
+0(x|X)[0-9a-zA-Z]+              {
+                                    yylval.node = NULL;
+                                    error_flag = true;
+                                    printf("Error type A at Line %d: Incorrect hex number \"%s\".\n", yylineno, yytext);
+                                    return INT; // still treat as a node
                                 }
 ({NZDIGIT}{DIGIT}*)|0           { 
                                     yylval.node = ast_make_new_node(
