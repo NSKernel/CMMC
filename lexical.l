@@ -17,6 +17,7 @@
     #include "syntax.tab.h"
     #include <debug.h>
     int yycolumn = 1;
+    int bc_line_iterator;
     #define YY_USER_ACTION \
         yylloc.first_line = yylloc.last_line = yylineno; \
         yylloc.first_column = yycolumn; \
@@ -29,6 +30,7 @@
     #define false 0
 #endif
 	char error_flag = false;
+    char bc_changed_line = false;
     
 %}
 
@@ -43,8 +45,18 @@ HEXDIGIT        [0-9abcdefABCDEF]
 "//"[^\n]*                      { 
                                     print_debug("Lexer DBG: LINE COMMENT\n");
                                 }
-"/""*"*(([^\*]*(\*[^\/])?)*)"*"*"*/"
-                                {
+"/*"([^\*]*"*"+[^\*/])*[^\*]*"*"+"/"  {
+                                    // Block comment regex borrowed from http://www.cs.man.ac.uk/~pjj/cs212/ex2_str_comm.html
+                                    for (bc_line_iterator = 0; bc_line_iterator < strlen(yytext); bc_line_iterator++) {
+                                        if (yytext[bc_line_iterator] == '\n')
+                                            bc_changed_line = true;
+                                    }
+                                    if (bc_changed_line) {
+                                        yycolumn = 1;
+                                        for (bc_line_iterator--; yytext[bc_line_iterator] != '\n'; bc_line_iterator--) {
+                                            yycolumn += 1;
+                                        }
+                                    }
                                     print_debug("Lexer DBG: BLOCK COMMENT\n");
                                 }
 
