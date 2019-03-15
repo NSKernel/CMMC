@@ -129,7 +129,7 @@ int main(int argc, char** argv)
     if (argc > 1)
         if(!(yyin = fopen(global_args.input_file, "r")))
 		{
-            printf("cmmc: \033[0;31merror\033[0m: cannot open file %s", global_args.input_file);
+            printf("cmmc: \033[0;31merror\033[0m: cannot open file %s\n", global_args.input_file);
             return 1;
         }
 #ifdef PRINT_BISON_DEBUG_INFO

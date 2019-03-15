@@ -70,7 +70,7 @@
 Program : ExtDefList    
         { 
             root_node = ast_make_new_node(
-                "PROGRAM", 
+                "Program", 
                 @1.first_line,
                 false, 
                 NULL, 
@@ -766,6 +766,7 @@ Exp : Exp DOT ID
             $$->children[2] = $3;
         }
   | Exp LB error RB  { $$ = NULL; }
+  | LP error RP { $$ = NULL; }
   ;
 Args : Exp COMMA Args
         {

@@ -70,7 +70,7 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                         0);
                                     sscanf(yytext, "0%o", &(yylval.node->int_value));
                                     
-                                    print_debug("Lexer DBG: INT with value of%d\n", yylval.node->int_value);
+                                    print_debug("Lexer DBG: INT with value of %d\n", yylval.node->int_value);
                                     
                                     return INT; 
                                 }
@@ -88,9 +88,12 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                         NULL, 
                                         T_INT,
                                         0);
-                                    sscanf(yytext, "0x%x", &(yylval.node->int_value)); 
+                                    if (yytext[1] == 'x')
+                                        sscanf(yytext, "0x%x", &(yylval.node->int_value)); 
+                                    if (yytext[1] == 'X')
+                                        sscanf(yytext, "0X%x", &(yylval.node->int_value)); 
                                     
-                                    print_debug("Lexer DBG: INT with value of%d\n", yylval.node->int_value);
+                                    print_debug("Lexer DBG: INT with value of d\n", yylval.node->int_value);
                                     
                                     return INT; 
                                 }
@@ -110,7 +113,7 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                         0);
                                     yylval.node->int_value = atoi(yytext); 
                                     
-                                    print_debug("Lexer DBG: INT with value of%d\n", yylval.node->int_value);
+                                    print_debug("Lexer DBG: INT with value of %d\n", yylval.node->int_value);
                                     
                                     return INT; 
                                 }
@@ -124,7 +127,7 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                         0);
                                     yylval.node->float_value = atof(yytext); 
                                     
-                                    print_debug("Lexer DBG: FLOAT with value of%f\n", yylval.node->float_value);
+                                    print_debug("Lexer DBG: FLOAT with value of %f\n", yylval.node->float_value);
                                     
                                     return FLOAT; 
                                 }
@@ -138,7 +141,7 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                         0);
                                     yylval.node->float_value = atof(yytext);
                                     
-                                    print_debug("Lexer DBG: FLOAT with value of%f\n", yylval.node->float_value);
+                                    print_debug("Lexer DBG: FLOAT with value of %f\n", yylval.node->float_value);
                                      
                                     return FLOAT;
                                 }
