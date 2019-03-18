@@ -46,7 +46,7 @@ HEXDIGIT        [0-9abcdefABCDEF]
                                     print_debug("Lexer DBG: LINE COMMENT\n");
                                 }
 "/*"([^\*]*"*"+[^\*/])*[^\*]*"*"+"/"  {
-                                    // Block comment regex borrowed from http://www.cs.man.ac.uk/~pjj/cs212/ex2_str_comm.html
+                                    // Block comment regex borrowed idea from http://www.cs.man.ac.uk/~pjj/cs212/ex2_str_comm.html
                                     for (bc_line_iterator = 0; bc_line_iterator < strlen(yytext); bc_line_iterator++) {
                                         if (yytext[bc_line_iterator] == '\n')
                                             bc_changed_line = true;

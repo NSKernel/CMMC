@@ -20,6 +20,10 @@
 
     extern int yylex();
     int yyerror(char* msg);
+    #ifdef DEBUG
+    #define YYDEBUG  1  
+    int yydebug = 1;
+    #endif
 %}
 
 %union
