@@ -10,6 +10,7 @@
 include config
 
 CC = gcc
+LD = ld
 FLEX = flex
 YACC = bison
 
@@ -40,7 +41,8 @@ endif
 
 UNAME = $(shell uname)
 ifeq ($(UNAME), Darwin)
-	LDFLAGS += -ll -lSystem -macosx_version_min $(MACOSX_MIN_VER)
+	CC = clang
+	LDFLAGS += -L/usr/local/opt/flex/lib -L/usr/local/opt/bison/lib -lfl -lSystem -macosx_version_min $(MACOSX_MIN_VER) 
 	CCFLAGS += -mmacosx-version-min=$(MACOSX_MIN_VER)
 endif
 ifeq ($(UNAME), Linux)
