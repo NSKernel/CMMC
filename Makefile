@@ -48,35 +48,35 @@ ifeq ($(UNAME), Linux)
 endif
 
 build/cmmc: $(OBJS) $(YCGENOBJS) $(LCGENOBJS)
-	@echo "  LD      " $(OBJS)
+	@echo "  LD      " build/cmmc
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS)
-	@echo "  "$@" is ready"
+	@echo $@" is ready"
 
 build/%.o: %.c
 	@mkdir -p build
-	@echo "  CC      " $<
+	@echo "  CC      " $@
 	@$(CC) -o $@ $< $(CCFLAGS) -c -D VERSION=$(VERSIONSTR) -D SUBVERSION=$(SUBVERSIONSTR) -D BUILD=$(BUILDSTR)
 
 build/%.yy.o: gen/%.yy.c forcegen
 	@mkdir -p build
-	@echo "  CC [G]  " $<
+	@echo "  CC [G]  " $@
 	@$(CC) -o $@ $< $(CCFLAGS) -c
 
 build/%.tab.o: gen/%.tab.c forcegen
 	@mkdir -p build
-	@echo "  CC [G]  " $<
+	@echo "  CC [G]  " $@
 	@$(CC) -o $@ $< $(CCFLAGS) -c
 
 forcegen: $(YCFILE) $(LCFILE)
 
 gen/%.tab.c: %.y
 	@mkdir -p gen
-	@echo "  YACC    " $<
+	@echo "  YACC    " $@
 	@$(YACC) -o $@ -d -v $<
 
 gen/%.yy.c: %.l
 	@mkdir -p gen
-	@echo "  FLEX    " $<
+	@echo "  FLEX    " $@
 	@$(FLEX) -o $@ $<
 
 -include $(OBJS:.o=.d)

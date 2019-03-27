@@ -29,14 +29,12 @@
 typedef struct ast_node_t {
     char *name;
 
-	
 	char terminal_type;
 	
 	char is_terminal;
     uint32_t line_number;
 	uint32_t children_count;
-	union 
-	{
+	union {
 		char *string_value;
 		int int_value;
 		float float_value;
