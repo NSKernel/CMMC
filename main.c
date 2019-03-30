@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <getopt.h>
+#include <stdint.h>
 
 #include <ast.h>
 

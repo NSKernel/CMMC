@@ -13,6 +13,7 @@
 %{
     #include <stdio.h>
 	#include <string.h>
+    #include <stdint.h>
     #include <ast.h>
     #include "syntax.tab.h"
     #include <debug.h>

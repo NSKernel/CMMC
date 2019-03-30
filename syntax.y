@@ -10,6 +10,7 @@
 
 %{
     #include <stdio.h>
+    #include <stdint.h>
     #include <ast.h>
 
     #define YYERROR_VERBOSE

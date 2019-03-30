@@ -8,6 +8,8 @@
     Defines ast operations
 */
 
+#include <stdint.h>
+
 #include "ast.h"
 
 ast_node *ast_make_new_node(char *name, uint32_t line_number, char is_terminal, const void *value, char terminal_type, uint32_t children_count) {

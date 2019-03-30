@@ -9,6 +9,7 @@
 */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifndef TRUE_FALSE_KEYWORD
