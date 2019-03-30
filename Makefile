@@ -42,7 +42,7 @@ endif
 UNAME = $(shell uname)
 ifeq ($(UNAME), Darwin)
 	CC = clang
-	LDFLAGS += -L/usr/local/opt/flex/lib -L/usr/local/opt/bison/lib -lfl -lSystem -macosx_version_min $(MACOSX_MIN_VER) 
+	LDFLAGS += -ll -mmacosx-version-min=$(MACOSX_MIN_VER)
 	CCFLAGS += -mmacosx-version-min=$(MACOSX_MIN_VER)
 endif
 ifeq ($(UNAME), Linux)
@@ -51,7 +51,7 @@ endif
 
 build/cmmc: $(OBJS) $(YCGENOBJS) $(LCGENOBJS)
 	@echo "  LD      " build/cmmc
-	@$(LD) -o $@ $(OBJS) $(LDFLAGS)
+	@$(CC) -o $@ $(OBJS) $(LDFLAGS)
 	@echo $@" is ready"
 
 build/%.o: %.c

@@ -17,6 +17,9 @@
     #include <ast.h>
     #include "syntax.tab.h"
     #include <debug.h>
+
+    #define _POSIX_C_SOURCE 1
+
     int yycolumn = 1;
     int bc_line_iterator;
     #define YY_USER_ACTION \

@@ -14,13 +14,14 @@
     #include <ast.h>
 
     #define YYERROR_VERBOSE
+    #define _POSIX_C_SOURCE 1
 
     ast_node *root_node;
     extern char error_flag;
     extern int yylineno;
 
     extern int yylex();
-    int yyerror(char* msg);
+    int yyerror(const char* msg);
     #ifdef DEBUG
     #define YYDEBUG  1  
     int yydebug = 1;
@@ -803,7 +804,7 @@ Args : Exp COMMA Args
 
 %%
 
-int yyerror(char* msg) {
+int yyerror(const char* msg) {
     error_flag = true;
 	fprintf(stdout, "Error type B at Line %d: %s.\n",  yylineno, msg);
     return 0;
