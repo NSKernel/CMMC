@@ -14,7 +14,7 @@ LD = ld
 FLEX = flex
 YACC = bison
 
-CCFLAGS = -std=c99 -I./
+CCFLAGS = -I./
 LDFLAGS = -ly -lc
 
 CFILES = $(shell find ./ -name "*.c")

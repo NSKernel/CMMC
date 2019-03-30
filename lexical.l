@@ -18,7 +18,7 @@
     #include "syntax.tab.h"
     #include <debug.h>
 
-    #define _POSIX_C_SOURCE 1
+    #define _POSIX_C_SOURCE 200809L
 
     int yycolumn = 1;
     int bc_line_iterator;

@@ -14,7 +14,7 @@
     #include <ast.h>
 
     #define YYERROR_VERBOSE
-    #define _POSIX_C_SOURCE 1
+    #define _POSIX_C_SOURCE 200809L
 
     ast_node *root_node;
     extern char error_flag;
