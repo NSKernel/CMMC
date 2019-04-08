@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-#include "ast.h"
+#include <ast.h>
 
 ast_node *ast_make_new_node(char *name, uint32_t line_number, char is_terminal, const void *value, char terminal_type, uint32_t children_count) {
 	  ast_node *return_node;
@@ -22,6 +22,7 @@ ast_node *ast_make_new_node(char *name, uint32_t line_number, char is_terminal, 
 	  if (terminal_type == T_ID_TYPE || terminal_type == T_OTHER) {
 		    return_node->string_value = (char*)malloc(strlen(value) + 1);
 				strncpy(return_node->string_value, value, strlen(value));
+				return_node->string_value[strlen(value)] = 0;
 	  }
 	  if (terminal_type == T_INT) {
 			  if (value != NULL)

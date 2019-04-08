@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include <ast.h>
+#include <semantics.h>
 
 static const char *opt_string = "vV";
 static const struct option long_opts[] = {
@@ -140,7 +141,8 @@ int main(int argc, char** argv)
 	if (!error_flag)
 	{
 		memset(spaces, 0, 100 * sizeof(char));
-		print_ast(root_node);
+		//print_ast(root_node);
+        sem_validate(root_node);
 	}
 	return 0;
 }

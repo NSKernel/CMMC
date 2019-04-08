@@ -140,6 +140,19 @@ ExtDef : Specifier ExtDecList SEMI
             $$->children[1] = $2;
             $$->children[2] = $3;
         }
+  | Specifier FunDec SEMI 
+        {
+            $$ = ast_make_new_node(
+                "ExtDef", 
+                @1.first_line,
+                false, 
+                NULL, 
+                T_NT,
+                3);
+            $$->children[0] = $1;
+            $$->children[1] = $2;
+            $$->children[2] = $3;
+        }
   | error SEMI  
         {
             $$ = NULL;
