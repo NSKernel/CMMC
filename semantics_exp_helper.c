@@ -125,10 +125,6 @@ _sem_exp_type *_sem_validate_exp(ast_node *node) {
             // Counter example:
             // struct a func() {int x[2];...};
             // then func().x[1] is not a lvalue
-            if (type_1->is_lvalue)
-                ret_type->is_lvalue = 1;
-            else 
-                ret_type->is_lvalue = 0;
 
             ret_type->array_dimension -= 1;
             if (ret_type->array_dimension)
@@ -139,7 +135,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node) {
             return ret_type;
         }
         if (!strcmp(node->children[1]->name, "DOT")) {
-            if (type_1->type != SYMBOL_T_STRUCT) {
+            if (type_1->type != SYMBOL_T_STRUCT || (type_1->is_array)) {
                 _sem_report_error("Error type 13 at Line %d: Illegal use of \".\"", node->children[1]->line_number);
                 free(type_1);
                 return NULL;

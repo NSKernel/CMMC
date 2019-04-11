@@ -130,6 +130,7 @@ void _sem_validate_ext_def(ast_node *node) {
         }
         else {
             // CompSt
+            func_entry->is_function_dec = 0;
             return_type.type = type;
             return_type.is_array = 0;
             return_type.is_lvalue = 0;
@@ -170,7 +171,7 @@ void _sem_validate_stmt(ast_node *node, int context, _sem_exp_type *return_type)
             return;
         }
     }
-    if (!strcmp(node->children[0]->name, "CompStmt")) {
+    if (!strcmp(node->children[0]->name, "CompSt")) {
         _sem_validate_comp_st(node->children[0], context, return_type);
     }
     if (!strcmp(node->children[0]->name, "RETURN")) {
