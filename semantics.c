@@ -136,10 +136,10 @@ void _sem_validate_ext_def(ast_node *node) {
             return_type.is_lvalue = 0;
             return_type.array_dimension = 0;
             return_type.struct_specifier = struct_specifier;
+            symtable_insert(func_entry, 0, 0, 0); // Insert here to make recursion possible
             // in comp_st, symtable will pop symbols
             // at level 1 but those without free will remain
             _sem_validate_comp_st(node->children[2], 0, &return_type);
-            symtable_insert(func_entry, 0, 0, 0);
         }
     }
     else {
