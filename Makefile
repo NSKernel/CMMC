@@ -15,7 +15,7 @@ FLEX = flex
 YACC = bison
 
 CCFLAGS = -I./
-LDFLAGS = -ly -lc
+LDFLAGS = -lc
 
 CFILES = $(shell find ./ -name "*.c")
 LFILE = $(shell find ./ -name "*.l")
@@ -32,11 +32,13 @@ LCGENOBJS = $(addprefix build/, $(addsuffix .tab.o,  $(notdir $(basename $(YFILE
 VERSIONSTR = "\"$(VERSION)\""
 SUBVERSIONSTR = "\"$(SUBVERSION)\""
 ifeq ($(DEBUG), 1)
-    CFLAGS += -DDEBUG -ggdb
+    CFLAGS += -DDEBUG -ggdb3 -O0
 	BUILDSTR = "\"$(BUILD)-debug\""
+	LDFLAGS += -DDEBUG -ggdb3 -O0
 else
 	CFLAGS += -O2
 	BUILDSTR = "\"$(BUILD)\""
+	LDFLAGS += -O0
 endif
 
 UNAME = $(shell uname)
@@ -47,11 +49,12 @@ ifeq ($(UNAME), Darwin)
 endif
 ifeq ($(UNAME), Linux)
 	LDFLAGS += -lfl
+	CCFLAGS += -lfl
 endif
 
 build/cmmc: $(OBJS) $(YCGENOBJS) $(LCGENOBJS)
 	@echo "  LD      " build/cmmc
-	@$(CC) -o $@ $(OBJS) $(LDFLAGS)
+	@$(CC) $(LDFLAGS) -o $@ $(OBJS)
 	@echo $@" is ready"
 
 build/%.o: %.c

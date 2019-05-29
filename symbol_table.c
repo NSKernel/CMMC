@@ -14,6 +14,7 @@
 
 #include <debug.h>
 #include <semantics.h>
+#include <ir.h>
 #include <symbol_table.h>
 
 symbol_list *_symtable_clear_when_exit = NULL;
@@ -22,6 +23,44 @@ void _symtable_print();
 
 void symtable_init() {
     symbol_table_root = NULL;
+    // add read and write
+    symbol_entry *read_symbol = malloc(sizeof(symbol_entry));
+    read_symbol->id = "read";
+    read_symbol->type = SYMBOL_T_INT;
+    read_symbol->is_array = 0;
+    read_symbol->is_function = 1;
+    read_symbol->is_function_dec = 0;
+    read_symbol->array_dimention = 0;
+    read_symbol->array_size = NULL;
+    read_symbol->param_count = 0;
+    read_symbol->params = NULL;
+    read_symbol->size = 4;
+    read_symbol->is_constant = IR_NON_CONSTANT;
+    read_symbol->struct_constant_space = NULL;
+    read_symbol->struct_specifier = NULL;
+    symtable_insert(read_symbol, 0, 0, 0, 0);
+    symbol_entry *write_symbol = malloc(sizeof(symbol_entry));
+    write_symbol->id = "write";
+    write_symbol->type = SYMBOL_T_VOID; // write is a void
+    write_symbol->is_array = 0;
+    write_symbol->is_function = 1;
+    write_symbol->is_function_dec = 0;
+    write_symbol->array_dimention = 0;
+    write_symbol->array_size = NULL;
+    write_symbol->param_count = 1;
+    symbol_list *write_param = malloc(sizeof(symbol_entry));
+    symbol_entry *write_param_entry = malloc(sizeof(symbol_entry));
+    write_param_entry->id = "content";
+    write_param_entry->type = SYMBOL_T_INT;
+    write_param_entry->is_constant = IR_NON_CONSTANT;
+    write_param->symbol = write_param_entry;
+    write_param->next = NULL;
+    write_symbol->params = write_param;
+    write_symbol->size = 0;
+    write_symbol->is_constant = IR_NON_CONSTANT;
+    write_symbol->struct_constant_space = NULL;
+    write_symbol->struct_specifier = NULL;
+    symtable_insert(write_symbol, 0, 0, 0, 0);
 }
 
 char symtable_param_struct_compare(symbol_list *sl1, symbol_list *sl2) {
@@ -40,7 +79,7 @@ char symtable_param_struct_compare(symbol_list *sl1, symbol_list *sl2) {
     return 1;
 }
 
-int symtable_insert(symbol_entry *symbol, int context, char in_struct, char do_not_free) {
+int symtable_insert(symbol_entry *symbol, int context, char in_struct, char do_not_free, char is_param) {
     symbol_table *new_node;
     symbol_table *iterator = symbol_table_root;
 
@@ -85,6 +124,7 @@ int symtable_insert(symbol_entry *symbol, int context, char in_struct, char do_n
     
     new_node = malloc(sizeof(symbol_table));
     new_node->symbol = symbol;
+    new_node->symbol->is_param = is_param;
     new_node->context = context;
     new_node->do_not_free = do_not_free;
     new_node->next = symbol_table_root;
@@ -175,8 +215,16 @@ void symtable_pop_context_without_free(int context) {
 symbol_entry *symtable_query(char *id) {
     symbol_table *iterator;
     iterator = symbol_table_root;
+    int top_context;
+    if (symbol_table_root != NULL) {
+        top_context = symbol_table_root->context;
+    }
     while (iterator != NULL) {
         if (!strcmp(iterator->symbol->id, id)) {
+            if (iterator->context == top_context)
+                iterator->symbol->is_top_context = 1;
+            else
+                iterator->symbol->is_top_context = 0;
             return iterator->symbol;
         }
         iterator = iterator->next;

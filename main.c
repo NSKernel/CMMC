@@ -14,6 +14,7 @@
 
 #include <ast.h>
 #include <semantics.h>
+#include <global.h>
 
 static const char *opt_string = "vV";
 static const struct option long_opts[] = {
@@ -21,12 +22,6 @@ static const struct option long_opts[] = {
     { "version", no_argument, NULL, 'V' },
     { NULL, no_argument, NULL, 0 }
 };
-
-struct global_args_t {
-    char print_version;          /* -V or --version */
-    char verbose;                /* -v or --verbose */
-    char *input_file;
-} global_args;
 
 char spaces[100];
 int space_count = 0;
@@ -116,15 +111,20 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    if (argc - optind > 0) {
+    if (argc - optind > 1) {
         global_args.input_file = argv[optind];
+        global_args.output_file = argv[optind + 1];
+        output_file = fopen(global_args.output_file, "w+");
+        if (output_file == NULL) {
+            printf("cmmc: \033[0;31merror\033[0m: cannot write file %s\n", global_args.output_file);
+        }
     }
     else {
-        printf("Usage: cmmc <file_path>\n");
+        printf("Usage: cmmc <file_path> <output_path>\n");
         return -1;
     }
 
-    if (argc - optind > 1) {
+    if (argc - optind > 2) {
         printf("cmmc: warning: ignoring extra arguments\n");
     }
 
@@ -144,5 +144,6 @@ int main(int argc, char** argv)
 		//print_ast(root_node);
         sem_validate(root_node);
 	}
+    fclose(output_file);
 	return 0;
 }

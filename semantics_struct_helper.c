@@ -85,7 +85,7 @@ symbol_list *_sem_validate_dec_list_for_struct(ast_node *node, int type, struct_
             free(ret_list);
             return (void*)(-1);
         }
-        if (symtable_insert(ins_entry, context, 1, 1)) {
+        if (symtable_insert(ins_entry, context, 1, 1, 0)) {
             // Falied to insert
             symtable_free_symbol(ins_entry);
             free(ret_list);
@@ -98,7 +98,7 @@ symbol_list *_sem_validate_dec_list_for_struct(ast_node *node, int type, struct_
     else if (node->children_count == 3) { // Dec COMMA DecList
         ins_entry = _sem_validate_dec_for_struct(node->children[0], type, struct_specifier);
         if (ins_entry != NULL) {
-            if (symtable_insert(ins_entry, context, 1, 1)) {
+            if (symtable_insert(ins_entry, context, 1, 1, 0)) {
                 // Falied to insert
                 symtable_free_symbol(ins_entry);
                 ins_entry = NULL;
@@ -125,6 +125,8 @@ symbol_list *_sem_validate_dec_list_for_struct(ast_node *node, int type, struct_
 }
 
 symbol_entry *_sem_validate_dec_for_struct(ast_node *node, int type, struct_specifier *struct_specifier) {
+    int i = 0;
+    
     if (node->children_count == 3) { // VarDec ASSIGNOP Exp
         // NOT ALLOWED!
         _sem_report_error("Error type 15 at Line %d: Attempt to assign a field", node->children[1]->line_number);
@@ -133,7 +135,22 @@ symbol_entry *_sem_validate_dec_for_struct(ast_node *node, int type, struct_spec
     
     symbol_entry *ret_entry = _sem_validate_var_dec(node->children[0]);
     ret_entry->type = type;
+    if (type == SYMBOL_T_INT) {
+        ret_entry->size = 4;
+    }
+    if (type == SYMBOL_T_FLOAT) {
+        ret_entry->size = 8;
+    }
+    if (type == SYMBOL_T_STRUCT) {
+        ret_entry->size = struct_specifier->size;
+    }
     ret_entry->struct_specifier = struct_specifier;
+
+    if (ret_entry->is_array) {
+        for (i = 0; i < ret_entry->array_dimention; i++) {
+            ret_entry->size *= ret_entry->array_size[i];
+        }
+    }
 
     return ret_entry;
 }
