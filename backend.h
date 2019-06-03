@@ -4,19 +4,16 @@
 
     A lab of Compilers at Nanjing University
 
-    codegen_vm.c
-    Generates VM target code
+    backend.h
+    Backend definitions
 */
 
 #include <stdint.h>
+#include <stdio.h>
 
+#include <global.h>
 #include <ast.h>
 #include <ir.h>
 
-void cg_vm_ext_def_list(ast_node *root) {
-    return;
-}
 
-void cg_vm_ext_def(ast_node *node) {
-    
-}
+void cg_mips_generate(ir_func_list *func);

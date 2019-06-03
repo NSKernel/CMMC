@@ -90,6 +90,7 @@ struct ir_t {
     uint32_t goto_label;
     ir *immediate_ir;
     char *func_name;
+    uint32_t param_count;
 };
 
 struct ir_node_t {
@@ -123,12 +124,14 @@ static inline void ir_merge_buffer(ir_list *buffer1, ir_list *buffer2)
 }
 
 void ir_add_node_to_buffer(ir_list *buffer, ir *ir_content);
-uint32_t ir_new_variable();
-uint32_t ir_new_temp_val();
+int ir_new_variable(int size);
+int ir_new_temp_val(int size);
 uint32_t ir_new_label();
+void ir_reset_counter();
 ir *ir_simplify_maccess(ir *old_ir, ir_list *ret_ir);
 void ir_print_list(ir_list *buffer);
 void ir_compress_label(ir_list *ir_content);
 void _ir_print_ir(ir *ir_content);
+int ir_stack_size();
 
 #endif

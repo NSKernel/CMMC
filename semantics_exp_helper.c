@@ -170,7 +170,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
 
                     // == star
                     // must commit type_2 as a single ir
-                    type_2->immediate_ir->temp_id = ir_new_temp_val();
+                    type_2->immediate_ir->temp_id = ir_new_temp_val(4);
                     type_2->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_2->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                     ir_add_node_to_buffer(ret_ir, type_2->immediate_ir);
@@ -311,7 +311,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 }
                 else if (type_2->constant_exp_status == SEM_CONSTANT_IMMEDIATE) {
                     // commit type_2
-                    type_2->immediate_ir->temp_id = ir_new_temp_val();
+                    type_2->immediate_ir->temp_id = ir_new_temp_val(4);
                     type_2->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_2->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                     ir_add_node_to_buffer(ret_ir, type_2->immediate_ir);
@@ -451,7 +451,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 if (type_1->immediate_ir->op != IR_EXP_OP_MACCESS) {
                     // commit the code and turn into t1 + 0
                     // I think this case won't happen...
-                    type_1->immediate_ir->temp_id = ir_new_temp_val();
+                    type_1->immediate_ir->temp_id = ir_new_temp_val(4);
                     temp_var_reg = type_1->immediate_ir->temp_id;
                     type_1->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_1->immediate_ir->mode.op1 = IR_MODE_NORMAL;
@@ -510,7 +510,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                     type_2->immediate_ir = ir_simplify_maccess(type_2->immediate_ir, ret_ir);
                 }
                 else {
-                    type_2->immediate_ir->temp_id = ir_new_temp_val();
+                    type_2->immediate_ir->temp_id = ir_new_temp_val(4);
                     temp_var_reg = type_2->immediate_ir->temp_id;
                     type_2->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_2->immediate_ir->mode.op1 = IR_MODE_NORMAL;
@@ -525,7 +525,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 type_2->immediate_ir->int_val2 = size_multiplier;
                 type_2->immediate_ir->mode.mode3 = IR_MODE_I;
                 type_2->immediate_ir->mode.op3 = IR_MODE_NORMAL;
-                type_2->immediate_ir->temp_id = ir_new_temp_val();
+                type_2->immediate_ir->temp_id = ir_new_temp_val(4);
                 type_2->immediate_ir->mode.mode1 = IR_MODE_T;
                 type_2->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, type_2->immediate_ir);
@@ -540,7 +540,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 ir_entry->temp_id2 = type_2->immediate_ir->temp_id;
                 ir_entry->mode.mode3 = type_2->immediate_ir->mode.mode1;
                 ir_entry->mode.op3 = type_2->immediate_ir->mode.op1;
-                ir_entry->temp_id = ir_new_temp_val();
+                ir_entry->temp_id = ir_new_temp_val(4);
                 ir_entry->mode.mode1 = IR_MODE_T;
                 ir_entry->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, ir_entry);
@@ -563,7 +563,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 type_2->immediate_ir->int_val2 = size_multiplier;
                 type_2->immediate_ir->mode.mode3 = IR_MODE_I;
                 type_2->immediate_ir->mode.op3 = IR_MODE_NORMAL;
-                type_2->immediate_ir->temp_id = ir_new_temp_val();
+                type_2->immediate_ir->temp_id = ir_new_temp_val(4);
                 type_2->immediate_ir->mode.mode1 = IR_MODE_T;
                 type_2->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 type_2->immediate_ir->temp_id1 = type_2->ir_temp_val_id;
@@ -595,7 +595,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 ir_entry->temp_id2 = type_2->immediate_ir->temp_id;
                 ir_entry->mode.mode3 = type_2->immediate_ir->mode.mode1;
                 ir_entry->mode.op3 = type_2->immediate_ir->mode.op1;
-                ir_entry->temp_id = ir_new_temp_val();
+                ir_entry->temp_id = ir_new_temp_val(4);
                 ir_entry->mode.mode1 = IR_MODE_T;
                 ir_entry->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, ir_entry);
@@ -640,7 +640,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 if (type_1->immediate_ir->op != IR_EXP_OP_MACCESS) {
                     // turn into MACCESS
                     // x + 0
-                    type_1->immediate_ir->temp_id = ir_new_temp_val();
+                    type_1->immediate_ir->temp_id = ir_new_temp_val(4);
                     type_1->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_1->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                     temp_var_reg = type_1->immediate_ir->temp_id;
@@ -792,7 +792,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                             ir_entry->op = IR_OP_IF;
                         else
                             ir_entry->op = IR_OP_IF_POSITIVE;
-                        ir_entry->immediate_ir->temp_id = ir_new_temp_val();
+                        ir_entry->immediate_ir->temp_id = ir_new_temp_val(4);
                         ir_entry->immediate_ir->mode.mode1 = IR_MODE_T;
                         ir_entry->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                         ir_add_node_to_buffer(ir_list_local2, ir_entry->immediate_ir);
@@ -903,7 +903,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                             ir_entry->op = IR_OP_IF;
                         else
                             ir_entry->op = IR_OP_IF_POSITIVE;
-                        ir_entry->immediate_ir->temp_id = ir_new_temp_val();
+                        ir_entry->immediate_ir->temp_id = ir_new_temp_val(4);
                         ir_entry->immediate_ir->mode.mode1 = IR_MODE_T;
                         ir_entry->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                         ir_add_node_to_buffer(ret_ir, ir_entry->immediate_ir);
@@ -955,7 +955,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
             ret_type->type = SYMBOL_T_INT;
             ret_type->is_array = 0;
             ret_type->constant_exp_status = SEM_CONSTANT_NO;
-            ret_type->ir_temp_val_id = ir_new_temp_val();
+            ret_type->ir_temp_val_id = ir_new_temp_val(4);
             ret_type->type_mode = SEM_TYPE_MODE_T;
             ret_type->type_mode_op = SEM_TYPE_MODE_NORMAL;
             temp_var_reg = ret_type->ir_temp_val_id;
@@ -1047,7 +1047,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
             }
             else {
                 type_1->constant_exp_status = SEM_CONSTANT_NO;
-                type_1->immediate_ir->temp_id = ir_new_temp_val();
+                type_1->immediate_ir->temp_id = ir_new_temp_val(4);
                 type_1->immediate_ir->mode.mode1 = IR_MODE_T;
                 type_1->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, type_1->immediate_ir);
@@ -1202,7 +1202,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                     type_1->immediate_ir = ir_simplify_maccess(type_1->immediate_ir, ret_ir);
                 }
                 else {
-                    type_1->immediate_ir->temp_id = ir_new_temp_val();
+                    type_1->immediate_ir->temp_id = ir_new_temp_val(4);
                     temp_var_reg = type_1->immediate_ir->temp_id;
                     type_1->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_1->immediate_ir->mode.op1 = IR_MODE_NORMAL;
@@ -1245,7 +1245,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                     type_1->immediate_ir->mode.op3 = type_2->immediate_ir->mode.op2;
                 }
                 else {
-                    type_2->immediate_ir->temp_id = ir_new_temp_val();
+                    type_2->immediate_ir->temp_id = ir_new_temp_val(4);
                     temp_var_reg = type_2->immediate_ir->temp_id;
                     type_2->immediate_ir->mode.mode1 = IR_MODE_T;
                     type_2->immediate_ir->mode.op1 = IR_MODE_NORMAL;
@@ -1360,7 +1360,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 ir_entry = type_1->immediate_ir;
             }
             else {
-                type_1->immediate_ir->temp_id = ir_new_temp_val();
+                type_1->immediate_ir->temp_id = ir_new_temp_val(4);
                 type_1->immediate_ir->mode.mode1 = IR_MODE_T;
                 type_1->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, type_1->immediate_ir);
@@ -1370,7 +1370,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 ir_entry->mode.op3 = IR_MODE_NORMAL;
             }
             ir_entry->op = IR_EXP_OP_MINUS;
-            ir_entry->temp_id = ir_new_temp_val();
+            ir_entry->temp_id = ir_new_temp_val(4);
             ir_entry->mode.mode1 = IR_MODE_T;
             ir_entry->mode.op1 = IR_MODE_NORMAL;
             ir_entry->int_val1 = 0;
@@ -1410,7 +1410,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 ir_entry->mode.op3 = IR_MODE_STAR;
             }
             ir_entry->op = IR_EXP_OP_MINUS;
-            ir_entry->temp_id = ir_new_temp_val();
+            ir_entry->temp_id = ir_new_temp_val(4);
             ir_entry->mode.mode1 = IR_MODE_T;
             ir_entry->mode.op1 = IR_MODE_NORMAL;
             ir_entry->int_val1 = 0;
@@ -1444,7 +1444,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
                 type_1->immediate_ir = ir_simplify_maccess(type_1->immediate_ir, ret_ir);
             }
             else {
-                type_1->immediate_ir->temp_id = ir_new_temp_val();
+                type_1->immediate_ir->temp_id = ir_new_temp_val(4);
                 temp_var_reg = type_1->immediate_ir->temp_id;
                 type_1->immediate_ir->mode.mode1 = IR_MODE_T;
                 type_1->immediate_ir->mode.op1 = IR_MODE_NORMAL;
@@ -1558,6 +1558,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
             ret_type->struct_specifier = symbol->struct_specifier;
             ir_entry = malloc(sizeof(ir));
             ir_entry->op = IR_OP_CALL;
+            ir_entry->param_count = symbol->param_count;
             ir_entry->func_name = node->children[0]->string_value;
             if (!strcmp(ir_entry->func_name, "read")) {
                 ir_entry->op = IR_OP_READ;
@@ -1637,6 +1638,7 @@ _sem_exp_type *_sem_validate_exp(ast_node *node, char no_optimization, ir_list *
             ret_type->struct_specifier = symbol->struct_specifier;
             ir_entry = malloc(sizeof(ir));
             ir_entry->op = IR_OP_CALL;
+            ir_entry->param_count = symbol->param_count;
             ir_entry->func_name = node->children[0]->string_value;
             ret_type->constant_exp_status = SEM_CONSTANT_IMMEDIATE;
             ret_type->immediate_ir = ir_entry;
@@ -1708,7 +1710,7 @@ _sem_exp_type_list *_sem_validate_args(ast_node *node, char no_optimization, ir_
                 }
             }
             else {
-                current_type->immediate_ir->temp_id = ir_new_temp_val();
+                current_type->immediate_ir->temp_id = ir_new_temp_val(4);
                 current_type->immediate_ir->mode.mode1 = IR_MODE_T;
                 current_type->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, current_type->immediate_ir);
@@ -1791,7 +1793,7 @@ _sem_exp_type_list *_sem_validate_args(ast_node *node, char no_optimization, ir_
                 }
             }
             else {
-                current_type->immediate_ir->temp_id = ir_new_temp_val();
+                current_type->immediate_ir->temp_id = ir_new_temp_val(4);
                 current_type->immediate_ir->mode.mode1 = IR_MODE_T;
                 current_type->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, current_type->immediate_ir);

@@ -18,6 +18,7 @@
 #include <symbol_table.h>
 #include <semantics.h>
 #include <ir.h>
+#include <backend.h>
 
 void _sem_validate_ext_def_list(ast_node *node, ir_func_list *ret_ir);
 void _sem_validate_ext_def(ast_node *node, ir_func_list *ret_ir);
@@ -26,7 +27,7 @@ void _sem_validate_ext_dec_list(ast_node *node, int type, struct_specifier *stru
 symbol_entry *_sem_validate_var_dec(ast_node *node);
 struct_specifier *_sem_validate_struct_specifier(ast_node *node, int context, int do_not_free);
 symbol_entry *_sem_validate_fun_dec(ast_node *node, int type, struct_specifier *struct_specifier, ir_list *ret_ir);
-int _sem_validate_var_list(ast_node *node, symbol_list **param_list, ir_list *ret_ir);
+int _sem_validate_var_list(ast_node *node, symbol_list **param_list, ir_list *ret_ir, int offset);
 symbol_entry *_sem_validate_param_dec(ast_node *node);
 void _sem_validate_def_list(ast_node *node, int context, char no_optimization, ir_list *ret_ir);
 void _sem_validate_def(ast_node *node, int context, char no_optimization, ir_list *ret_ir);
@@ -66,6 +67,7 @@ char sem_validate(ast_node *root) {
     // Current node: Program
     if (root->children[0] != NULL) {
         _sem_validate_ext_def_list(root->children[0], root_ir);
+        cg_mips_generate(root_ir);
     }
     // else {
     //     empty program!
@@ -94,7 +96,14 @@ void _sem_validate_ext_def_list(ast_node *node, ir_func_list *ret_ir) {
         sec_ir->func_content = NULL;
         sec_ir->next = NULL;
         _sem_validate_ext_def_list(node->children[1], sec_ir);
-        ret_ir->next = sec_ir;
+        if (sec_ir->func_content == NULL) {
+            // nothing to do
+            ret_ir->next = NULL;
+            free(sec_ir);
+        }
+        else {
+            ret_ir->next = sec_ir;
+        }
         return;
     }
 } 
@@ -110,6 +119,7 @@ void _sem_validate_ext_def(ast_node *node, ir_func_list *ret_ir) {
     symbol_entry *func_entry;
     _sem_exp_type return_type;
     ir_list *func_contents;
+    ir *ir_dec;
     type = _sem_validate_specifier(node->children[0], &struct_specifier, 0, 0);
     if (type == SYMBOL_T_ERROR) {
         // specifier validation failed with error
@@ -165,15 +175,22 @@ void _sem_validate_ext_def(ast_node *node, ir_func_list *ret_ir) {
             func_contents = malloc(sizeof(ir_list));
             func_contents->head = NULL;
             func_contents->tail = NULL;
+            // reset the offset
+            ir_reset_counter();
             _sem_validate_comp_st(node->children[2], 0, &return_type, 0, func_contents);
             if (func_contents->head == NULL) {
                 // error
                 free(func_contents);
                 return;
             }
+            // add a dec
+            ir_dec = malloc(sizeof(ir));
+            ir_dec->op = IR_OP_DEC;
+            ir_dec->size = ir_stack_size();
+            ir_add_node_to_buffer(func_header, ir_dec);
             ir_merge_buffer(func_header, func_contents);
             ir_compress_label(func_header);
-            ir_print_list(func_header);
+            //ir_print_list(func_header);
             ret_ir->func_content = func_header;
         }
     }
@@ -220,7 +237,7 @@ void _sem_validate_stmt(ast_node *node, int context, _sem_exp_type *return_type,
             // but CALL will!
             if (exp_type->immediate_ir->op == IR_OP_CALL) {
                 // assign a dummy to it
-                exp_type->immediate_ir->temp_id = ir_new_temp_val();
+                exp_type->immediate_ir->temp_id = ir_new_temp_val(4);
                 exp_type->immediate_ir->mode.mode1 = IR_MODE_T;
                 exp_type->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ir_list_local, exp_type->immediate_ir);
@@ -257,7 +274,7 @@ void _sem_validate_stmt(ast_node *node, int context, _sem_exp_type *return_type,
                 ir_entry->mode.op1 = exp_type->immediate_ir->mode.op2;
             }
             else {
-                exp_type->immediate_ir->temp_id = ir_new_temp_val();
+                exp_type->immediate_ir->temp_id = ir_new_temp_val(4);
                 exp_type->immediate_ir->mode.mode1 = IR_MODE_T;
                 exp_type->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                 ir_add_node_to_buffer(ret_ir, exp_type->immediate_ir);
@@ -381,7 +398,7 @@ void _sem_validate_stmt(ast_node *node, int context, _sem_exp_type *return_type,
                 default:
                     // generate new temp var
                     ir_entry->op = IR_OP_IF;
-                    ir_entry->immediate_ir->temp_id = ir_new_temp_val();
+                    ir_entry->immediate_ir->temp_id = ir_new_temp_val(4);
                     ir_entry->immediate_ir->mode.mode1 = IR_MODE_T;
                     ir_entry->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                     ir_add_node_to_buffer(ret_ir, ir_entry->immediate_ir);
@@ -540,7 +557,7 @@ void _sem_validate_stmt(ast_node *node, int context, _sem_exp_type *return_type,
                     default:
                         // generate new temp var
                         ir_entry->op = IR_OP_IF;
-                        ir_entry->immediate_ir->temp_id = ir_new_temp_val();
+                        ir_entry->immediate_ir->temp_id = ir_new_temp_val(4);
                         ir_entry->immediate_ir->mode.mode1 = IR_MODE_T;
                         ir_entry->immediate_ir->mode.op1 = IR_MODE_NORMAL;
                         ir_add_node_to_buffer(ret_ir, ir_entry->immediate_ir);
@@ -636,7 +653,7 @@ void _sem_validate_ext_dec_list(ast_node *node, int type, struct_specifier *stru
     if (type == SYMBOL_T_STRUCT)
         ins_entry->size = struct_specifier->size;
     ins_entry->struct_specifier = struct_specifier;
-    ins_entry->ir_variable_id = ir_new_variable();
+    ins_entry->ir_variable_id = ir_new_variable(ins_entry->size);
 
     // we do not have ext dec and ir does not support ext dec
     // so we will not generate code for it
@@ -804,6 +821,8 @@ symbol_entry *_sem_validate_fun_dec(ast_node *node, int type, struct_specifier *
     symbol_entry *ret_entry = malloc(sizeof(symbol_entry));
     symbol_list *param_list = NULL;
     ir *ir_entry = malloc(sizeof(ir));
+    symbol_list *param_iterator;
+    int stack_offset = 12;
 
     ret_entry->type = type;
     ret_entry->struct_specifier = struct_specifier;
@@ -836,8 +855,16 @@ symbol_entry *_sem_validate_fun_dec(ast_node *node, int type, struct_specifier *
         ret_entry->params = NULL;
     } 
     else if (node->children_count == 4) {
-        ret_entry->param_count = _sem_validate_var_list(node->children[2], &param_list, ret_ir);
+        ret_entry->param_count = _sem_validate_var_list(node->children[2], &param_list, ret_ir, -12);
         ret_entry->params = param_list;
+        param_iterator = ret_entry->params;
+        while (param_iterator != NULL) {
+            // stack: | sp | fp | ra | ARG1 | ARG2  
+            //       fp    4    8   12
+            param_iterator->symbol->ir_variable_id = -stack_offset;
+            stack_offset += 4;
+            param_iterator = param_iterator->next;
+        }
     }
     else {
         assert(0);
@@ -847,20 +874,20 @@ symbol_entry *_sem_validate_fun_dec(ast_node *node, int type, struct_specifier *
     return ret_entry;
 }
 
-int _sem_validate_var_list(ast_node *node, symbol_list **param_list, ir_list *ret_ir) {
+int _sem_validate_var_list(ast_node *node, symbol_list **param_list, ir_list *ret_ir, int offset) {
     symbol_list *ret_list;
     ir *ir_entry = malloc(sizeof(ir));
     int ret_val = 0;
     // ParamDec
     symbol_entry *current_entry = _sem_validate_param_dec(node->children[0]);
     ir_entry->op = IR_OP_PARAM;
-    ir_entry->var_id = current_entry->ir_variable_id;
+    ir_entry->var_id = offset;
     ir_entry->size = current_entry->size;
     ir_add_node_to_buffer(ret_ir, ir_entry);
 
     symbol_list *ret_list_tail = NULL;
     if (node->children_count == 3) {
-        ret_val = _sem_validate_var_list(node->children[2], &ret_list_tail, ret_ir);
+        ret_val = _sem_validate_var_list(node->children[2], &ret_list_tail, ret_ir, offset - 4);
     }
     if (current_entry == NULL) {
         if (ret_val == 0) {
@@ -897,7 +924,6 @@ symbol_entry *_sem_validate_param_dec(ast_node *node) {
     ret_entry = _sem_validate_var_dec(node->children[1]);
     ret_entry->type = type;
     ret_entry->struct_specifier = struct_specifier;
-    ret_entry->ir_variable_id = ir_new_variable();
     ret_entry->is_constant = IR_UNDECIDED;
 
     if (ret_entry->type == SYMBOL_T_STRUCT) {
@@ -919,6 +945,7 @@ symbol_entry *_sem_validate_param_dec(ast_node *node) {
             ret_entry->size *= ret_entry->array_size[iterator];
         }
     }
+    ret_entry->ir_variable_id = ir_new_variable(ret_entry->size);
 
     // try to insert!
     if (symtable_insert(ret_entry, 1, 0, 1, 1)) {
@@ -991,36 +1018,36 @@ symbol_entry *_sem_validate_dec(ast_node *node, int type, struct_specifier *pars
     symbol_entry *ret_entry = _sem_validate_var_dec(node->children[0]);
     ret_entry->type = type;
     ret_entry->struct_specifier = parsed_struct_specifier;
-    ret_entry->ir_variable_id = ir_new_variable();
     ret_entry->is_constant = IR_NON_CONSTANT;
     if (ret_entry->type == SYMBOL_T_STRUCT) {
-        ir_entry = malloc(sizeof(ir));
-        ir_entry->op = IR_OP_DEC;
-        ir_entry->var_id = ret_entry->ir_variable_id;
-        ir_entry->size = parsed_struct_specifier->size;
+        ret_entry->size = parsed_struct_specifier->size;
         if (ret_entry->is_array) {
             for (iterator = 0; iterator < ret_entry->array_dimention; iterator++) {
-                ir_entry->size *= ret_entry->array_size[iterator];
+                ret_entry->size *= ret_entry->array_size[iterator];
             }
         }
-        ret_entry->size = ir_entry->size;
-        ir_add_node_to_buffer(ret_ir, ir_entry);
+        ret_entry->ir_variable_id = ir_new_variable(ret_entry->size);
     }
     else if (ret_entry->is_array) {
-        ir_entry = malloc(sizeof(ir));
-        ir_entry->var_id = ret_entry->ir_variable_id;
-        ir_entry->op = IR_OP_DEC;
         if (type == SYMBOL_T_INT) {
-            ir_entry->size = 4;
+            ret_entry->size = 4;
         }
         else {
-            ir_entry->size = 8;
+            ret_entry->size = 8;
         }
         for (iterator = 0; iterator < ret_entry->array_dimention; iterator++) {
-            ir_entry->size *= ret_entry->array_size[iterator];
+            ret_entry->size *= ret_entry->array_size[iterator];
         }
-        ret_entry->size = ir_entry->size;
-        ir_add_node_to_buffer(ret_ir, ir_entry);
+        ret_entry->ir_variable_id = ir_new_variable(ret_entry->size);
+    }
+    else {
+        if (type == SYMBOL_T_INT) {
+            ret_entry->size = 4;
+        }
+        else {
+            ret_entry->size = 8;
+        }
+        ret_entry->ir_variable_id = ir_new_variable(ret_entry->size);
     }
 
     if (node->children_count == 3) { // VarDec ASSIGNOP Exp

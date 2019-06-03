@@ -16,8 +16,8 @@
 #include <debug.h>
 #include <global.h>
 
-uint32_t _ir_variable_count = 0;
-uint32_t _ir_temp_val_count = 0;
+int _ir_variable_offset = 0;
+// uint32_t _ir_temp_val_count = 0;
 uint32_t _ir_label_count = 0;
 
 void _ir_print_3(ir *ir_content) {
@@ -609,16 +609,26 @@ void ir_print_list(ir_list *buffer) {
     }
 }
 
-uint32_t ir_new_variable() {
-    return _ir_variable_count++;
+int ir_new_variable(int size) {
+    _ir_variable_offset += size;
+    return _ir_variable_offset;
 }
 
-uint32_t ir_new_temp_val() {
-    return _ir_temp_val_count++;
+int ir_new_temp_val(int size) {
+    _ir_variable_offset += size;
+    return _ir_variable_offset;
 }
 
 uint32_t ir_new_label() {
     return _ir_label_count++;
+}
+
+int ir_stack_size() {
+    return _ir_variable_offset;
+}
+
+void ir_reset_counter() {
+    _ir_variable_offset = 0;
 }
 
 ir *ir_simplify_maccess(ir *old_ir, ir_list *ret_ir) {
@@ -627,7 +637,7 @@ ir *ir_simplify_maccess(ir *old_ir, ir_list *ret_ir) {
     assert(old_ir->op == IR_EXP_OP_MACCESS);
     if (old_ir->int_val2 != 0) {
         old_ir->op = IR_EXP_OP_ADD;
-        old_ir->temp_id = ir_new_temp_val();
+        old_ir->temp_id = ir_new_temp_val(4);
         temp_var_reg = old_ir->temp_id;
         old_ir->mode.mode1 = IR_MODE_T;
         old_ir->mode.op1 = IR_MODE_NORMAL;
@@ -646,7 +656,7 @@ ir *ir_simplify_maccess(ir *old_ir, ir_list *ret_ir) {
             old_ir->mode.op2 = IR_MODE_STAR;
         }
         else if (old_ir->mode.op2 == IR_MODE_STAR) {
-            old_ir->temp_id = ir_new_temp_val();
+            old_ir->temp_id = ir_new_temp_val(4);
             old_ir->op = IR_EXP_OP_ASSIGN;
             temp_var_reg = old_ir->temp_id;
             old_ir->mode.mode1 = IR_MODE_T;
