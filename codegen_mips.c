@@ -655,7 +655,12 @@ void _cg_mips_generate_call(ir *content) {
     // | sp | fp | ra | ARG1
     // ^
     // fp & sp
-    fprintf(output_file, "  jal %s\n", content->func_name);
+    if (!strcmp(content->func_name, "main")) {
+        fprintf(output_file, "  jal %s\n", content->func_name);
+    }
+    else {
+        fprintf(output_file, "  jal _%s\n", content->func_name);
+    }
     // | .....  last frame ..... | sp | fp | ra | ARG1
     // ^                         ^
     // sp                        fp
@@ -808,7 +813,7 @@ void _cg_mips_generate_function(ir_list *list) {
                 fprintf(output_file, "  addi $sp, $sp, %d\n", -(iterator->content->size));
                 break;
             case IR_OP_FUNC:
-                fprintf(output_file, "%s :\n", iterator->content->func_name);
+                fprintf(output_file, "_%s :\n", iterator->content->func_name);
                 break;
             case IR_OP_GOTO:
                 fprintf(output_file, "  j label%d\n", iterator->content->goto_label);
